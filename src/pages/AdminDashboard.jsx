@@ -280,7 +280,7 @@ const AdminDashboard = () => {
   return (
     <div className="admin-dashboard-page">
       <nav>
-        <Link to="/" className="logo">HomePlus</Link>
+        <Link to="/" className="logo">PropElevate</Link>
         <div className="user-info">
           <span>👤 {userData?.fullName || userData?.email || 'Administrator'}</span>
           <button className="logout-btn" onClick={handleLogout}>Logout</button>

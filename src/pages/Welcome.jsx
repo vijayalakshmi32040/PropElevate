@@ -43,7 +43,7 @@ const Welcome = () => {
       <div className="decorative-circle circle-2"></div>
       
       <div className="welcome-content">
-        <div className="welcome-logo">HomePlus</div>
+        <div className="welcome-logo">PropElevate</div>
         <div className="welcome-tagline">TRANSFORM YOUR DREAM HOME</div>
         <button className="explore-btn" onClick={handleExplore}>
           <span>EXPLORE WEBSITE</span>

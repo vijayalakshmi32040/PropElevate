@@ -95,8 +95,8 @@ const Login = () => {
     // Simulate authentication delay
     setTimeout(() => {
       // For admin, check if email is from allowed domain
-      if (loginType === 'admin' && !loginData.email.endsWith('@homeplus.com')) {
-        setError('Administrator accounts must use @homeplus.com email');
+      if (loginType === 'admin' && !loginData.email.endsWith('@PropElevate.com')) {
+        setError('Administrator accounts must use @PropElevate.com email');
         setLoading(false);
         return;
       }
@@ -177,8 +177,8 @@ const Login = () => {
       return;
     }
     
-    if (loginType === 'admin' && !signupData.email.endsWith('@homeplus.com')) {
-      setError('Administrator accounts must use @homeplus.com email (e.g., yourname@homeplus.com)');
+    if (loginType === 'admin' && !signupData.email.endsWith('@PropElevate.com')) {
+      setError('Administrator accounts must use @PropElevate.com email (e.g., yourname@PropElevate.com)');
       setLoading(false);
       return;
     }
@@ -257,7 +257,7 @@ const Login = () => {
       <div className="login-container">
         <div className={`login-header ${loginType === 'admin' ? 'admin-header' : ''}`}>
           <Link to="/" className="back-arrow">←</Link>
-          <Link to="/" className="login-logo">HomePlus</Link>
+          <Link to="/" className="login-logo">PropElevate</Link>
           <div className="login-type">
             {loginType === 'admin' ? 'Administrator Portal' : 'Homeowner Portal'}
           </div>
@@ -313,12 +313,12 @@ const Login = () => {
                     name="email"
                     value={loginData.email}
                     onChange={handleLoginChange}
-                    placeholder={loginType === 'admin' ? 'yourname@homeplus.com' : 'your.email@example.com'}
+                    placeholder={loginType === 'admin' ? 'yourname@PropElevate.com' : 'your.email@example.com'}
                     required 
                     disabled={loading}
                   />
                   {loginType === 'admin' && (
-                    <small className="form-hint">Admin accounts must use @homeplus.com email (e.g., yourname@homeplus.com)</small>
+                    <small className="form-hint">Admin accounts must use @PropElevate.com email (e.g., yourname@PropElevate.com)</small>
                   )}
                 </div>
                 <div className="form-group">
@@ -400,12 +400,12 @@ const Login = () => {
                     name="email"
                     value={signupData.email}
                     onChange={handleSignupChange}
-                    placeholder={loginType === 'admin' ? 'yourname@homeplus.com' : 'your.email@example.com'}
+                    placeholder={loginType === 'admin' ? 'yourname@PropElevate.com' : 'your.email@example.com'}
                     required 
                     disabled={loading}
                   />
                   {loginType === 'admin' && (
-                    <small className="form-hint">Admin accounts must use @homeplus.com email (e.g., yourname@homeplus.com)</small>
+                    <small className="form-hint">Admin accounts must use @PropElevate.com email (e.g., yourname@PropElevate.com)</small>
                   )}
                 </div>
                 <div className="form-group">

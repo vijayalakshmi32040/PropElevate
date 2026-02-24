@@ -80,7 +80,7 @@ const HomeownerDashboard = () => {
   return (
     <div className="dashboard-page">
       <nav>
-        <Link to="/" className="logo">HomePlus</Link>
+        <Link to="/" className="logo">PropElevate</Link>
         <div className="user-info">
           <span>Welcome, {userData?.fullName || localStorage.getItem('userName') || 'Homeowner'}</span>
           <button className="history-nav-btn" onClick={() => setActiveTab('history')}>📜 History</button>

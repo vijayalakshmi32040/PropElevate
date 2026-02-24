@@ -67,7 +67,7 @@ const PropertyPlatform = () => {
   return (
     <div className="property-platform-page">
       <nav className={isScrolled ? 'scrolled' : ''}>
-        <Link to="/" className="logo">HomePlus</Link>
+        <Link to="/" className="logo">PropElevate</Link>
         <div className="nav-links">
           <a href="#features">Features</a>
           <a href="#ideas">Upgrade Ideas</a>
@@ -93,7 +93,7 @@ const PropertyPlatform = () => {
 
       <section id="features" className="features-section">
         <div className="container">
-          <h2 className="section-title">Why Choose HomePlus?</h2>
+          <h2 className="section-title">Why Choose PropElevate?</h2>
           <p className="section-subtitle">Expert guidance and practical solutions to enhance every corner of your home</p>
           <div className="features-grid">
             {features.map((feature, index) => (
@@ -169,7 +169,7 @@ const PropertyPlatform = () => {
         <div className="container">
           <div className="footer-content">
             <div className="footer-brand">
-              <Link to="/" className="logo">HomePlus</Link>
+              <Link to="/" className="logo">PropElevate</Link>
               <p>Transform your dream home</p>
             </div>
             <div className="footer-links">
