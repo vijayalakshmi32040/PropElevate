@@ -1,0 +1,491 @@
+:root {
+  --primary: #D4691C;
+  --primary-light: #E88A3F;
+  --secondary: #2C5F4F;
+  --accent: #F4D03F;
+  --dark: #1A1A1A;
+  --light: #FAF8F5;
+  --text: #2D2D2D;
+  --text-light: #6B6B6B;
+  --border: #E5DDD3;
+}
+
+.property-platform-page {
+  font-family: 'DM Sans', sans-serif;
+}
+
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  background: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s;
+}
+
+nav.scrolled {
+  background: rgba(26, 26, 26, 0.95);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+}
+
+.hero-section {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2C5F4F 0%, #1A4038 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 105, 28, 0.2) 0%, transparent 70%);
+  top: -200px;
+  right: -200px;
+  animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-50px, 50px) scale(1.1); }
+}
+
+.hero-content {
+  max-width: 900px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 4.5rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  color: rgba(250, 248, 245, 0.9);
+  margin-bottom: 3rem;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.hero-btn {
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.hero-btn.primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 10px 30px rgba(212, 105, 28, 0.3);
+}
+
+.hero-btn.primary:hover {
+  background: var(--primary-light);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(212, 105, 28, 0.4);
+}
+
+.hero-btn.secondary {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.hero-btn.secondary:hover {
+  background: white;
+  color: var(--secondary);
+}
+
+.features-section,
+.roles-section {
+  padding: 6rem 2rem;
+  background: var(--light);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--dark);
+}
+
+.section-subtitle {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 1.1rem;
+  margin-bottom: 4rem;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
+}
+
+.feature-box {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  transition: all 0.4s;
+  border: 1px solid var(--border);
+}
+
+.feature-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.feature-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--dark);
+}
+
+.feature-box p {
+  color: var(--text-light);
+  line-height: 1.7;
+}
+
+/* Ideas Section - Scrolling Carousel */
+.ideas-section {
+  padding: 6rem 0;
+  background: #f8f6f3;
+  overflow: hidden;
+}
+
+.ideas-section .container {
+  padding: 0 2rem;
+  margin-bottom: 3rem;
+}
+
+.ideas-scroll-wrapper {
+  width: 100%;
+  overflow: hidden;
+  padding: 1rem 0;
+}
+
+.ideas-scroll-track {
+  display: flex;
+  gap: 1.5rem;
+  animation: scroll 40s linear infinite;
+  width: max-content;
+}
+
+.ideas-scroll-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.idea-scroll-card {
+  flex-shrink: 0;
+  width: 200px;
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.idea-scroll-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+  border-color: var(--card-color);
+}
+
+.idea-scroll-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.idea-scroll-card:hover .idea-scroll-icon {
+  transform: scale(1.1);
+}
+
+.idea-scroll-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  color: var(--dark);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 3rem;
+  margin-top: 3rem;
+}
+
+.role-card {
+  background: white;
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  border: 2px solid var(--primary);
+}
+
+.role-card.admin-card {
+  border-color: var(--secondary);
+}
+
+.role-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.role-icon {
+  font-size: 3rem;
+}
+
+.role-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  color: var(--dark);
+}
+
+.role-features {
+  list-style: none;
+  margin-bottom: 2rem;
+}
+
+.role-features li {
+  padding: 0.8rem 0;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.role-features li:before {
+  content: '✓ ';
+  color: var(--primary);
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.role-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background: var(--primary);
+  color: white;
+  text-align: center;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.role-btn:hover {
+  background: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.role-btn.admin {
+  background: var(--secondary);
+}
+
+.role-btn.admin:hover {
+  background: #1A4038;
+}
+
+.cta-section {
+  padding: 6rem 2rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  text-align: center;
+  color: white;
+}
+
+.cta-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.95;
+}
+
+.cta-btn {
+  padding: 1.2rem 3rem;
+  background: white;
+  color: var(--primary);
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: inline-block;
+  transition: all 0.3s;
+}
+
+.cta-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+footer {
+  background: var(--dark);
+  color: white;
+  padding: 3rem 2rem;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.footer-brand p {
+  color: rgba(250, 248, 245, 0.7);
+  margin-top: 0.5rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.footer-links a {
+  color: rgba(250, 248, 245, 0.8);
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+}
+
+.copyright {
+  text-align: center;
+  color: rgba(250, 248, 245, 0.5);
+  padding-top: 2rem;
+  border-top: 1px solid rgba(250, 248, 245, 0.1);
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+  }
+  
+  nav {
+    padding: 1rem 1.5rem;
+  }
+  
+  .nav-links {
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .idea-scroll-card {
+    width: 160px;
+    padding: 1rem;
+  }
+  
+  .idea-scroll-icon {
+    font-size: 2.5rem;
+  }
+  
+  .idea-scroll-card h3 {
+    font-size: 0.9rem;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    text-align: center;
+  }
+}

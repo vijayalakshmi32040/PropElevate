@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="homeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4691C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E88A3F;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- House roof -->
+  <polygon points="50,10 10,45 25,45 25,85 75,85 75,45 90,45" fill="url(#homeGrad)"/>
+  <!-- Door -->
+  <rect x="40" y="55" width="20" height="30" fill="#2C5F4F"/>
+  <!-- Window -->
+  <rect x="55" y="50" width="12" height="12" fill="#FAF8F5" rx="2"/>
+  <!-- Plus sign -->
+  <rect x="46" y="20" width="8" height="20" fill="#FAF8F5" rx="1"/>
+  <rect x="41" y="25" width="18" height="8" fill="#FAF8F5" rx="1"/>
+</svg>
