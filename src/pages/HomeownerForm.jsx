@@ -140,7 +140,7 @@ const HomeownerForm = () => {
   return (
     <div className="homeowner-form-page">
       <nav>
-        <Link to="/" className="logo">HomePlus</Link>
+        <Link to="/" className="logo">PropElevate</Link>
         <div className="user-info">
           <span>Welcome, {userData?.fullName || localStorage.getItem('userName') || 'Homeowner'}</span>
           <button className="logout-btn" onClick={handleLogout}>Logout</button>
