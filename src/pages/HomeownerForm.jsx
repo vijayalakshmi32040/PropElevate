@@ -19,8 +19,6 @@ const HomeownerForm = () => {
   });
   
   const [selectedImprovements, setSelectedImprovements] = useState([]);
-  const [images, setImages] = useState([]);
-  const [dragOver, setDragOver] = useState(false);
 
   const availableUpdates = [
     "Kitchen Renovation", "Bathroom Upgrade", "Living Room Makeover",
@@ -62,44 +60,6 @@ const HomeownerForm = () => {
     }
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    const files = Array.from(e.dataTransfer.files);
-    handleFiles(files);
-  };
-
-  const handleFileSelect = (e) => {
-    const files = Array.from(e.target.files);
-    handleFiles(files);
-  };
-
-  const handleFiles = (files) => {
-    files.forEach(file => {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setImages(prev => [...prev, { file, preview: e.target.result }]);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  };
-
-  const removeImage = (index) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userData');
@@ -118,7 +78,6 @@ const HomeownerForm = () => {
     const submissionData = {
       ...formData,
       improvements: selectedImprovements,
-      imageCount: images.length,
       ownerName: userData?.fullName || 'Homeowner',
       ownerEmail: userData?.email || localStorage.getItem('userEmail'),
       submissionDate: new Date().toISOString(),
@@ -132,6 +91,24 @@ const HomeownerForm = () => {
     const userEmail = userData?.email || localStorage.getItem('userEmail');
     localStorage.setItem(`propertyData_${userEmail}`, JSON.stringify(submissionData));
     localStorage.setItem('propertyData', JSON.stringify(submissionData));
+
+    // Add initial homeowner history entry for this submission
+    const homeownerHistory = JSON.parse(localStorage.getItem(`homeownerHistory_${userEmail}`) || '[]');
+    homeownerHistory.unshift({
+      id: Date.now(),
+      action: 'Submission',
+      details: 'You submitted your property details for review',
+      propertyDetails: {
+        propertyType: submissionData.propertyType,
+        city: submissionData.city,
+        state: submissionData.state,
+        propertyValue: submissionData.propertyValue,
+        builtUpArea: submissionData.builtUpArea,
+        improvements: submissionData.improvements
+      },
+      timestamp: new Date().toISOString()
+    });
+    localStorage.setItem(`homeownerHistory_${userEmail}`, JSON.stringify(homeownerHistory.slice(0, 50)));
     
     // Redirect to dashboard
     navigate('/homeowner-dashboard');
@@ -266,48 +243,6 @@ const HomeownerForm = () => {
                 />
               </div>
             </div>
-          </div>
-
-          {/* Property Images */}
-          <div className="form-section">
-            <h2>Property Images</h2>
-            <div 
-              className={`upload-area ${dragOver ? 'drag-over' : ''}`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => document.getElementById('fileInput').click()}
-            >
-              <div className="upload-icon">📷</div>
-              <p>Drag & drop images here or click to browse</p>
-              <input 
-                type="file" 
-                id="fileInput"
-                multiple 
-                accept="image/*"
-                onChange={handleFileSelect}
-                style={{ display: 'none' }}
-              />
-            </div>
-            {images.length > 0 && (
-              <div className="image-preview-grid">
-                {images.map((img, index) => (
-                  <div key={index} className="image-preview">
-                    <img src={img.preview} alt={`Preview ${index + 1}`} />
-                    <button 
-                      type="button" 
-                      className="remove-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeImage(index);
-                      }}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Desired Improvements */}

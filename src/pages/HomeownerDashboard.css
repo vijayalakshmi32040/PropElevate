@@ -16,6 +16,18 @@
   min-height: 100vh;
 }
 
+.dashboard-page nav {
+  position: relative;
+  background: white;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+  padding: 1.2rem 2rem;
+}
+
+.dashboard-page nav .logo,
+.dashboard-page nav .user-info {
+  color: var(--dark);
+}
+
 /* History Nav Button */
 .history-nav-btn {
   padding: 0.5rem 1rem;

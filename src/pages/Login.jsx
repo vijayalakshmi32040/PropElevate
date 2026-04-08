@@ -94,13 +94,6 @@ const Login = () => {
 
     // Simulate authentication delay
     setTimeout(() => {
-      // For admin, check if email is from allowed domain
-      if (loginType === 'admin' && !loginData.email.endsWith('@PropElevate.com')) {
-        setError('Administrator accounts must use @PropElevate.com email');
-        setLoading(false);
-        return;
-      }
-
       // Get registered users from localStorage
       const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
       const userKey = `${loginType}_${loginData.email}`;
@@ -145,7 +138,9 @@ const Login = () => {
       
       setTimeout(() => {
         if (loginType === 'admin') {
-          navigate('/admin-dashboard');
+          navigate('/design-advisor-dashboard');
+        } else if (loginType === 'super-admin') {
+          navigate('/admin-management');
         } else {
           // Check if homeowner already has property data
           const userPropertyData = localStorage.getItem(`propertyData_${loginData.email}`);
@@ -173,12 +168,6 @@ const Login = () => {
     
     if (!validateEmail(signupData.email)) {
       setError('Please enter a valid email address');
-      setLoading(false);
-      return;
-    }
-    
-    if (loginType === 'admin' && !signupData.email.endsWith('@PropElevate.com')) {
-      setError('Administrator accounts must use @PropElevate.com email (e.g., yourname@PropElevate.com)');
       setLoading(false);
       return;
     }
@@ -244,7 +233,9 @@ const Login = () => {
       
       setTimeout(() => {
         if (loginType === 'admin') {
-          navigate('/admin-dashboard');
+          navigate('/design-advisor-dashboard');
+        } else if (loginType === 'super-admin') {
+          navigate('/admin-management');
         } else {
           navigate('/homeowner-form');
         }
@@ -259,7 +250,7 @@ const Login = () => {
           <Link to="/" className="back-arrow">←</Link>
           <Link to="/" className="login-logo">PropElevate</Link>
           <div className="login-type">
-            {loginType === 'admin' ? 'Administrator Portal' : 'Homeowner Portal'}
+            {loginType === 'admin' ? 'Design Advisor Portal' : 'Homeowner Portal'}
           </div>
         </div>
 
@@ -313,12 +304,12 @@ const Login = () => {
                     name="email"
                     value={loginData.email}
                     onChange={handleLoginChange}
-                    placeholder={loginType === 'admin' ? 'yourname@PropElevate.com' : 'your.email@example.com'}
+                    placeholder={loginType === 'admin' ? 'yourname@gmail.com' : 'your.email@gmail.com'}
                     required 
                     disabled={loading}
                   />
                   {loginType === 'admin' && (
-                    <small className="form-hint">Admin accounts must use @PropElevate.com email (e.g., yourname@PropElevate.com)</small>
+                    <small className="form-hint">Design Advisor accounts can use any email address (e.g., yourname@gmail.com)</small>
                   )}
                 </div>
                 <div className="form-group">
@@ -400,12 +391,12 @@ const Login = () => {
                     name="email"
                     value={signupData.email}
                     onChange={handleSignupChange}
-                    placeholder={loginType === 'admin' ? 'yourname@PropElevate.com' : 'your.email@example.com'}
+                    placeholder={loginType === 'admin' ? 'yourname@gmail.com' : 'your.email@gmail.com'}
                     required 
                     disabled={loading}
                   />
                   {loginType === 'admin' && (
-                    <small className="form-hint">Admin accounts must use @PropElevate.com email (e.g., yourname@PropElevate.com)</small>
+                    <small className="form-hint">Design Advisor accounts can use any email address (e.g., yourname@gmail.com)</small>
                   )}
                 </div>
                 <div className="form-group">

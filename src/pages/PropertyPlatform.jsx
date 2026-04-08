@@ -86,7 +86,7 @@ const PropertyPlatform = () => {
           </p>
           <div className="hero-buttons">
             <Link to="/login?type=homeowner" className="hero-btn primary">Get Started</Link>
-            <Link to="/login?type=admin" className="hero-btn secondary">Administrator Login</Link>
+            <Link to="/login?type=admin" className="hero-btn secondary">Design Advisor Login</Link>
           </div>
         </div>
       </section>
@@ -144,14 +144,30 @@ const PropertyPlatform = () => {
             <div className="role-card admin-card">
               <div className="role-header">
                 <div className="role-icon">👤</div>
-                <h3>For Administrators</h3>
+                <h3>For Design Advisors</h3>
               </div>
               <ul className="role-features">
                 {adminFeatures.map((feature, index) => (
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
-              <Link to="/login?type=admin" className="role-btn admin">Admin Login</Link>
+              <Link to="/login?type=admin" className="role-btn admin">Design Advisor Login</Link>
+            </div>
+
+            <div className="role-card admin-card">
+              <div className="role-header">
+                <div className="role-icon">🔐</div>
+                <h3>For Administrators</h3>
+              </div>
+              <ul className="role-features">
+                <li>Full platform management</li>
+                <li>User and advisor management</li>
+                <li>Advanced analytics</li>
+                <li>System configuration</li>
+                <li>Performance monitoring</li>
+                <li>Quality assurance</li>
+              </ul>
+              <Link to="/login?type=super-admin" className="role-btn admin">Admin Login</Link>
             </div>
           </div>
         </div>

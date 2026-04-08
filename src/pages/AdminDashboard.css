@@ -16,11 +16,24 @@
   min-height: 100vh;
 }
 
+.admin-dashboard-page nav {
+  position: relative;
+  background: white;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+  padding: 1.2rem 2rem;
+}
+
 .admin-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 3rem 2rem;
 }
+
+.admin-dashboard-page nav .logo,
+.admin-dashboard-page nav .user-info {
+  color: var(--dark);
+}
+
 
 .header-section {
   margin-bottom: 3rem;

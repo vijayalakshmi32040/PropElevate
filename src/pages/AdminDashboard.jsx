@@ -38,7 +38,7 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    // Check if user is logged in
+    // Check if user is logged in as Design Advisor
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const userType = localStorage.getItem('userType');
     
@@ -282,14 +282,14 @@ const AdminDashboard = () => {
       <nav>
         <Link to="/" className="logo">PropElevate</Link>
         <div className="user-info">
-          <span>👤 {userData?.fullName || userData?.email || 'Administrator'}</span>
+          <span>👤 {userData?.fullName || userData?.email || 'Design Advisor'}</span>
           <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
       </nav>
 
       <div className="admin-container">
         <div className="header-section">
-          <h1>Admin Dashboard</h1>
+          <h1>Design Advisor Dashboard</h1>
           <p className="subtitle">Manage properties and homeowner requests</p>
         </div>
 
@@ -365,42 +365,20 @@ const AdminDashboard = () => {
                         </td>
                         <td>
                           <div className="action-buttons">
-                            {(property.status === 'Approved' || property.status === 'Estimated') && (
-                              <button 
-                                className="action-btn details-btn" 
-                                onClick={() => handleViewDetails(property)}
-                                title="View Details"
-                              >
-                                VIEW DETAILS
-                              </button>
-                            )}
-                            {property.status === 'Approved' && (
-                              <button 
-                                className="action-btn estimate-btn" 
-                                onClick={() => handleOpenEstimate(property)}
-                                title="Provide Estimate"
-                              >
-                                💰 ESTIMATE
-                              </button>
-                            )}
-                            {property.status !== 'Approved' && property.status !== 'Estimated' && (
-                              <>
-                                <button 
-                                  className="action-btn approve-btn" 
-                                  onClick={() => handleApprove(property.id)}
-                                  title="Approve"
-                                >
-                                  ✓
-                                </button>
-                                <button 
-                                  className="action-btn reject-btn" 
-                                  onClick={() => handleReject(property.id)}
-                                  title="Reject"
-                                >
-                                  ✗
-                                </button>
-                              </>
-                            )}
+                            <button 
+                              className="action-btn details-btn" 
+                              onClick={() => handleViewDetails(property)}
+                              title="View Details"
+                            >
+                              VIEW DETAILS
+                            </button>
+                            <button 
+                              className="action-btn estimate-btn" 
+                              onClick={() => handleOpenEstimate(property)}
+                              title="Estimate"
+                            >
+                              💰 ESTIMATE
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -446,7 +424,7 @@ const AdminDashboard = () => {
         <div className="quick-actions-section">
           <h2>Quick Actions</h2>
           <div className="actions-grid">
-            <button className="action-card" onClick={() => setActiveTab('submissions')}>
+            <button className="action-card" onClick={() => { setActiveTab('submissions'); loadPropertySubmissions(); }}>
               <span className="action-icon">📋</span>
               <span>View Submissions</span>
             </button>
@@ -454,13 +432,9 @@ const AdminDashboard = () => {
               <span className="action-icon">📜</span>
               <span>View History</span>
             </button>
-            <button className="action-card" onClick={handleRefresh}>
+            <button className="action-card" onClick={() => { handleRefresh(); window.scrollTo(0, 0); }}>
               <span className="action-icon">🔄</span>
               <span>Refresh Data</span>
-            </button>
-            <button className="action-card">
-              <span className="action-icon">📊</span>
-              <span>Analytics</span>
             </button>
           </div>
         </div>
@@ -555,7 +529,7 @@ const AdminDashboard = () => {
 
               {selectedProperty.adminEstimate && (
                 <div className="detail-section estimate-section">
-                  <h3>Admin Estimate</h3>
+                  <h3>Design Advisor Estimate</h3>
                   <div className="detail-grid">
                     <div className="detail-item">
                       <label>Total Cost</label>
