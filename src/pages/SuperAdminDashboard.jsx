@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './AdminDashboard.css';
+import apiService from '../services/api';
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
@@ -37,65 +38,49 @@ const SuperAdminDashboard = () => {
     loadAllData();
   }, [navigate]);
 
-  const loadAllData = () => {
-    // Load all users (homeowners + design advisors from registered users)
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-    const users = [];
-    const advisors = [];
+  const loadAllData = async () => {
+    try {
+      // Load all users from backend
+      const usersResponse = await apiService.getAllUsers();
+      
+      // Filter based on roles used in Login.jsx (USER, DESIGN_ADVISOR, ADMIN)
+      const users = usersResponse.filter(u => 
+        (u.role && u.role.toUpperCase() === 'USER') || 
+        (u.role && u.role.toLowerCase() === 'homeowner') || 
+        !u.role
+      );
+      
+      const advisors = usersResponse.filter(u => 
+        (u.role && u.role.toUpperCase() === 'DESIGN_ADVISOR') || 
+        (u.role && u.role.toLowerCase() === 'admin') || 
+        (u.role && u.role.toLowerCase() === 'advisor')
+      );
 
-    Object.entries(registeredUsers).forEach(([key, user]) => {
-      const roleType = key.split('_')[0]; // Extract role from key (homeowner_email or admin_email)
-      if (roleType === 'admin') {
-        advisors.push({
-          ...user,
-          id: key,
-          email: key.split('_')[1]
-        });
-      } else if (roleType === 'homeowner') {
-        users.push({
-          ...user,
-          id: key,
-          email: key.split('_')[1]
-        });
-      }
-    });
+      setAllUsers(users);
+      setDesignAdvisors(advisors);
 
-    setAllUsers(users);
-    setDesignAdvisors(advisors);
+      // Load all property submissions from backend
+      const submissions = await apiService.getAllProperties();
+      setPropertySubmissions(submissions);
 
-    // Load property submissions
-    const submissions = [];
-    const keys = Object.keys(localStorage);
-    
-    keys.forEach(key => {
-      if (key.startsWith('propertySubmission_')) {
-        try {
-          const submission = JSON.parse(localStorage.getItem(key));
-          submissions.push({
-            ...submission,
-            id: key,
-            submissionDate: submission.submissionDate || new Date().toISOString()
-          });
-        } catch (e) {
-          console.error('Error parsing submission:', e);
-        }
-      }
-    });
+      // Calculate stats
+      const estimatedCount = submissions.filter(s => 
+        s.status && s.status.toUpperCase() === 'ESTIMATED'
+      ).length;
 
-    setPropertySubmissions(submissions);
+      setStats({
+        totalUsers: users.length,
+        totalAdvisors: advisors.length,
+        totalSubmissions: submissions.length,
+        estimatesProvided: estimatedCount
+      });
 
-    // Calculate stats
-    const estimatedCount = submissions.filter(s => s.status === 'Estimated').length;
-    setStats({
-      totalUsers: users.length,
-      totalAdvisors: advisors.length,
-      totalSubmissions: submissions.length,
-      estimatesProvided: estimatedCount
-    });
-
-    // Load admin history
-    const history = JSON.parse(localStorage.getItem('adminHistory') || '[]');
-    setAdminHistory(history.slice(0, 10));
+      // Load admin history from localStorage (keep this for now if backend doesn't have history)
+      const history = JSON.parse(localStorage.getItem('adminHistory') || '[]');
+      setAdminHistory(history.slice(0, 10));
+    } catch (error) {
+      console.error('Error loading super admin data:', error);
+    }
   };
 
   const handleLogout = () => {
@@ -219,7 +204,6 @@ const SuperAdminDashboard = () => {
                       <th>Name</th>
                       <th>Email</th>
                       <th>Phone</th>
-                      <th>Joined</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -228,7 +212,6 @@ const SuperAdminDashboard = () => {
                         <td>{user.fullName || 'N/A'}</td>
                         <td>{user.email || 'N/A'}</td>
                         <td>{user.phone || 'N/A'}</td>
-                        <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -257,7 +240,6 @@ const SuperAdminDashboard = () => {
                       <th>Name</th>
                       <th>Email</th>
                       <th>Phone</th>
-                      <th>Joined</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -266,7 +248,6 @@ const SuperAdminDashboard = () => {
                         <td>{advisor.fullName || 'N/A'}</td>
                         <td>{advisor.email || 'N/A'}</td>
                         <td>{advisor.phone || 'N/A'}</td>
-                        <td>{advisor.createdAt ? new Date(advisor.createdAt).toLocaleDateString() : 'N/A'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -297,7 +278,6 @@ const SuperAdminDashboard = () => {
                       <th>Location</th>
                       <th>Value</th>
                       <th>Status</th>
-                      <th>Submitted</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -312,7 +292,6 @@ const SuperAdminDashboard = () => {
                             {submission.status || 'Pending Review'}
                           </span>
                         </td>
-                        <td>{submission.submissionDate ? new Date(submission.submissionDate).toLocaleDateString() : 'N/A'}</td>
                       </tr>
                     ))}
                   </tbody>

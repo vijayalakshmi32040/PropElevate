@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './HomeownerForm.css';
+import apiService from '../services/api';
 
 const HomeownerForm = () => {
   const navigate = useNavigate();
@@ -68,50 +69,67 @@ const HomeownerForm = () => {
     navigate('/');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Generate unique submission ID
-    const submissionId = `propertySubmission_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    // Prepare submission data with owner information
-    const submissionData = {
-      ...formData,
-      improvements: selectedImprovements,
-      ownerName: userData?.fullName || 'Homeowner',
-      ownerEmail: userData?.email || localStorage.getItem('userEmail'),
-      submissionDate: new Date().toISOString(),
-      status: 'Pending Review'
-    };
-    
-    // Save to localStorage with unique key for admin to access
-    localStorage.setItem(submissionId, JSON.stringify(submissionData));
-    
-    // Also save as current user's property data (per user email)
-    const userEmail = userData?.email || localStorage.getItem('userEmail');
-    localStorage.setItem(`propertyData_${userEmail}`, JSON.stringify(submissionData));
-    localStorage.setItem('propertyData', JSON.stringify(submissionData));
 
-    // Add initial homeowner history entry for this submission
-    const homeownerHistory = JSON.parse(localStorage.getItem(`homeownerHistory_${userEmail}`) || '[]');
-    homeownerHistory.unshift({
-      id: Date.now(),
-      action: 'Submission',
-      details: 'You submitted your property details for review',
-      propertyDetails: {
-        propertyType: submissionData.propertyType,
-        city: submissionData.city,
-        state: submissionData.state,
-        propertyValue: submissionData.propertyValue,
-        builtUpArea: submissionData.builtUpArea,
-        improvements: submissionData.improvements
-      },
-      timestamp: new Date().toISOString()
-    });
-    localStorage.setItem(`homeownerHistory_${userEmail}`, JSON.stringify(homeownerHistory.slice(0, 50)));
-    
-    // Redirect to dashboard
-    navigate('/homeowner-dashboard');
+    try {
+      const userId = localStorage.getItem('userId');
+
+      // Prepare submission data with owner information
+      const userEmail = userData?.email || localStorage.getItem('userEmail');
+      const ownerName = userData?.fullName || localStorage.getItem('userName') || 'Homeowner';
+
+      const submissionData = {
+        ...formData,
+        improvements: selectedImprovements.join(', '), // Convert array to string for backend
+        status: 'Pending Review',
+        ownerId: parseInt(userId), // Add owner ID for backend
+        ownerName,
+        ownerEmail: userEmail
+      };
+
+      // Submit to backend and capture saved property details
+      const savedProperty = await apiService.addProperty(submissionData);
+      const savedPropertyData = {
+        ...submissionData,
+        ...savedProperty,
+        id: savedProperty.id,
+        submissionDate: new Date().toISOString(),
+        improvementList: selectedImprovements
+      };
+
+      // Save to localStorage for admin access (with the backend property ID)
+      const submissionId = `propertySubmission_${savedProperty.id}`;
+      localStorage.setItem(submissionId, JSON.stringify(savedPropertyData));
+
+      // Also save locally for frontend display
+      localStorage.setItem(`propertyData_${userEmail}`, JSON.stringify(savedPropertyData));
+      localStorage.setItem('propertyData', JSON.stringify(savedPropertyData));
+
+      // Add initial homeowner history entry for this submission
+      const homeownerHistory = JSON.parse(localStorage.getItem(`homeownerHistory_${userEmail}`) || '[]');
+      homeownerHistory.unshift({
+        id: Date.now(),
+        action: 'Submission',
+        details: 'You submitted your property details for review',
+        propertyDetails: {
+          propertyType: submissionData.propertyType,
+          city: submissionData.city,
+          state: submissionData.state,
+          propertyValue: submissionData.propertyValue,
+          builtUpArea: submissionData.builtUpArea,
+          improvements: submissionData.improvements
+        },
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem(`homeownerHistory_${userEmail}`, JSON.stringify(homeownerHistory.slice(0, 50)));
+
+      // Redirect to dashboard
+      navigate('/homeowner-dashboard');
+    } catch (error) {
+      console.error('Failed to submit property:', error);
+      alert('Failed to submit property. Please try again.');
+    }
   };
 
   return (

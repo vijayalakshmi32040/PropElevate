@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './HomeownerDashboard.css';
+import api from '../services/api';
 
 const HomeownerDashboard = () => {
   const navigate = useNavigate();
@@ -8,6 +9,19 @@ const HomeownerDashboard = () => {
   const [userData, setUserData] = useState(null);
   const [homeownerHistory, setHomeownerHistory] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
+
+  const normalizeImprovements = (improvements, improvementList) => {
+    if (Array.isArray(improvements)) {
+      return improvements;
+    }
+    if (Array.isArray(improvementList) && improvementList.length > 0) {
+      return improvementList.map(item => item.trim()).filter(Boolean);
+    }
+    if (typeof improvements === 'string' && improvements.trim().length > 0) {
+      return improvements.split(',').map(item => item.trim()).filter(Boolean);
+    }
+    return [];
+  };
 
   // Format property type for display
   const formatPropertyType = (type) => {
@@ -37,20 +51,72 @@ const HomeownerDashboard = () => {
       setUserData(JSON.parse(storedUserData));
     }
 
-    // Load property data (per user email)
-    const userEmail = localStorage.getItem('userEmail');
-    const userPropertyData = localStorage.getItem(`propertyData_${userEmail}`);
-    if (userPropertyData) {
-      setPropertyData(JSON.parse(userPropertyData));
-    } else {
-      // Fallback to generic propertyData
-      const data = localStorage.getItem('propertyData');
-      if (data) {
-        setPropertyData(JSON.parse(data));
+    // Load property data and estimates from backend
+    const loadUserData = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          // Fetch user's properties from backend
+          const userProperties = await api.getUserProperties(userId);
+          
+          if (userProperties && userProperties.length > 0) {
+            // Get the most recent property
+            const latestProperty = userProperties[userProperties.length - 1];
+            latestProperty.improvements = normalizeImprovements(latestProperty.improvements, latestProperty.improvementList);
+            
+            // Try to fetch estimate for this property
+            try {
+              const estimate = await api.getEstimate(latestProperty.id);
+              if (estimate) {
+                let parsedCosts = null;
+                try {
+                  if (estimate.improvementCosts) {
+                    parsedCosts = JSON.parse(estimate.improvementCosts);
+                  }
+                } catch(e) {
+                  console.error("Error parsing improvement costs", e);
+                }
+                latestProperty.adminEstimate = {
+                  totalCost: estimate.totalCost,
+                  valueIncreasePercent: estimate.valueIncreasePercent,
+                  estimatedNewValue: estimate.estimatedNewValue,
+                  adminNotes: estimate.adminNotes,
+                  improvementCosts: parsedCosts,
+                  estimatedDate: new Date().toISOString() // Could be enhanced to store actual date
+                };
+                latestProperty.status = 'Estimated';
+              }
+            } catch (estimateError) {
+              console.log('No estimate found for property:', latestProperty.id);
+            }
+            
+            setPropertyData(latestProperty);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user properties:', error);
+        // Fallback to localStorage
+        const userEmail = localStorage.getItem('userEmail');
+        const userPropertyData = localStorage.getItem(`propertyData_${userEmail}`);
+        if (userPropertyData) {
+          const parsed = JSON.parse(userPropertyData);
+          parsed.improvements = normalizeImprovements(parsed.improvements, parsed.improvementList);
+          setPropertyData(parsed);
+        } else {
+          const data = localStorage.getItem('propertyData');
+          if (data) {
+            const parsed = JSON.parse(data);
+            parsed.improvements = normalizeImprovements(parsed.improvements, parsed.improvementList);
+            setPropertyData(parsed);
+          }
+        }
       }
-    }
+    };
+
+    loadUserData();
 
     // Load history
+    const userEmail = localStorage.getItem('userEmail');
     if (userEmail) {
       const history = JSON.parse(localStorage.getItem(`homeownerHistory_${userEmail}`) || '[]');
       setHomeownerHistory(history);
@@ -150,21 +216,83 @@ const HomeownerDashboard = () => {
               <div className="stat-card small">
                 <div className="stat-icon">🎯</div>
                 <h3>Selected Improvements</h3>
-                <p>{propertyData?.improvements?.length || 0}</p>
+                <p>{Array.isArray(propertyData?.improvements)
+                  ? propertyData.improvements.length
+                  : (propertyData?.improvements ? propertyData.improvements.split(',').map(i => i.trim()).filter(Boolean).length : 0)
+                }</p>
               </div>
             </div>
 
-            {propertyData?.improvements && propertyData.improvements.length > 0 && (
+            {propertyData?.improvements && (
               <div className="section">
                 <h2>Your Selected Improvements</h2>
                 <div className="improvements-list">
-                  {propertyData.improvements.map((improvement, index) => (
-                    <div key={index} className="improvement-item">
-                      <span className="checkmark">✓</span>
-                      <span>{improvement}</span>
-                    </div>
-                  ))}
+                  {Array.isArray(propertyData.improvements) 
+                    ? propertyData.improvements.map((improvement, index) => (
+                        <div key={index} className="improvement-item">
+                          <span className="checkmark">✓</span>
+                          <span>{improvement}</span>
+                        </div>
+                      ))
+                    : propertyData.improvements.split(', ').map((improvement, index) => (
+                        <div key={index} className="improvement-item">
+                          <span className="checkmark">✓</span>
+                          <span>{improvement.trim()}</span>
+                        </div>
+                      ))
+                  }
                 </div>
+              </div>
+            )}
+
+            {propertyData?.adminEstimate && (
+              <div className="section estimate-details-section">
+                <h2>Design Advisor Estimate Details</h2>
+                
+                {propertyData.adminEstimate.improvementCosts ? (
+                  <div className="improvements-list estimate-breakdown">
+                    {Object.entries(propertyData.adminEstimate.improvementCosts).map(([improvement, cost], index) => (
+                      <div key={index} className="improvement-item breakdown-item" style={{display: 'flex', justifyContent: 'space-between', paddingRight: '20px'}}>
+                        <div>
+                           <span className="checkmark">💰</span>
+                           <span>{improvement}</span>
+                        </div>
+                        <span className="cost-value font-weight-bold">₹{parseInt(cost || 0).toLocaleString('en-IN')}</span>
+                      </div>
+                    ))}
+                    <div className="improvement-item breakdown-item total-row" style={{display: 'flex', justifyContent: 'space-between', paddingRight: '20px', borderTop: '2px solid #eee', marginTop: '10px', paddingTop: '10px'}}>
+                      <div>
+                         <span className="checkmark" style={{opacity: 0}}>💰</span>
+                         <strong>Total Estimated Cost</strong>
+                      </div>
+                      <span className="cost-value" style={{fontWeight: 'bold', color: '#e67e22', fontSize: '1.1rem'}}>₹{parseInt(propertyData.adminEstimate.totalCost).toLocaleString('en-IN')}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="admin-notes">
+                    <p>Total Estimated Cost: <strong>₹{parseInt(propertyData.adminEstimate.totalCost).toLocaleString('en-IN')}</strong></p>
+                  </div>
+                )}
+                
+                <div className="stats-grid secondary-stats" style={{marginTop: '20px'}}>
+                  <div className="stat-card">
+                    <div className="stat-icon">📈</div>
+                    <h3>Value Increase</h3>
+                    <p>{propertyData.adminEstimate.valueIncreasePercent}%</p>
+                  </div>
+                  <div className="stat-card" style={{background: 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'}}>
+                    <div className="stat-icon">💎</div>
+                    <h3>Estimated New Value</h3>
+                    <p>₹{parseInt(propertyData.adminEstimate.estimatedNewValue).toLocaleString('en-IN')}</p>
+                  </div>
+                </div>
+                
+                {propertyData.adminEstimate.adminNotes && (
+                   <div className="admin-notes" style={{marginTop: '20px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '8px', borderLeft: '4px solid #e67e22'}}>
+                     <h4 style={{margin: '0 0 10px 0', color: '#333'}}>Advisor Notes:</h4>
+                     <p style={{margin: 0}}>{propertyData.adminEstimate.adminNotes}</p>
+                   </div>
+                )}
               </div>
             )}
           </>
@@ -203,9 +331,12 @@ const HomeownerDashboard = () => {
                               <span><strong>Area:</strong> {entry.propertyDetails.builtUpArea} sq ft</span>
                             )}
                           </div>
-                          {entry.propertyDetails.improvements && entry.propertyDetails.improvements.length > 0 && (
+                          {entry.propertyDetails.improvements && (
                             <div className="history-improvements">
-                              <strong>Improvements:</strong> {entry.propertyDetails.improvements.join(', ')}
+                              <strong>Improvements:</strong> {Array.isArray(entry.propertyDetails.improvements) 
+                                ? entry.propertyDetails.improvements.join(', ')
+                                : entry.propertyDetails.improvements
+                              }
                             </div>
                           )}
                         </div>
@@ -213,17 +344,32 @@ const HomeownerDashboard = () => {
 
                       {entry.estimateData && (
                         <div className="history-estimate-summary">
-                          <div className="estimate-mini-card">
-                            <span className="label">Total Cost</span>
-                            <span className="value">₹{parseInt(entry.estimateData.totalCost).toLocaleString('en-IN')}</span>
-                          </div>
-                          <div className="estimate-mini-card">
-                            <span className="label">Value Increase</span>
-                            <span className="value">{entry.estimateData.valueIncreasePercent}%</span>
-                          </div>
-                          <div className="estimate-mini-card">
-                            <span className="label">New Value</span>
-                            <span className="value">₹{parseInt(entry.estimateData.estimatedNewValue).toLocaleString('en-IN')}</span>
+                          {entry.estimateData.improvementCosts && Object.keys(entry.estimateData.improvementCosts).length > 0 && (
+                            <div className="history-items-breakdown" style={{width: '100%', marginBottom: '15px', backgroundColor: 'rgba(255,255,255,0.5)', padding: '10px', borderRadius: '8px'}}>
+                              <h4 style={{margin: '0 0 10px 0', fontSize: '0.9rem', color: '#555', borderBottom: '1px solid #ddd', paddingBottom: '5px'}}>Cost Breakdown:</h4>
+                              <div style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+                                {Object.entries(entry.estimateData.improvementCosts).map(([imp, cost], i) => (
+                                  <div key={i} style={{display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem'}}>
+                                    <span>{imp}</span>
+                                    <span style={{fontWeight: '500'}}>₹{parseInt(cost || 0).toLocaleString('en-IN')}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          <div style={{display: 'flex', gap: '15px', width: '100%'}}>
+                            <div className="estimate-mini-card">
+                              <span className="label">Total Cost</span>
+                              <span className="value">₹{parseInt(entry.estimateData.totalCost).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div className="estimate-mini-card">
+                              <span className="label">Value Increase</span>
+                              <span className="value">{entry.estimateData.valueIncreasePercent}%</span>
+                            </div>
+                            <div className="estimate-mini-card">
+                              <span className="label">New Value</span>
+                              <span className="value">₹{parseInt(entry.estimateData.estimatedNewValue).toLocaleString('en-IN')}</span>
+                            </div>
                           </div>
                         </div>
                       )}

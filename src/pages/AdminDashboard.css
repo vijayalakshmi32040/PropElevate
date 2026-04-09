@@ -390,6 +390,19 @@
   opacity: 0.9;
 }
 
+.delete-btn {
+  background: #e53935 !important;
+  color: white;
+  font-size: 0.75rem !important;
+  padding: 0.4rem 0.6rem !important;
+}
+
+.delete-btn:hover {
+  background: #b71c1c !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(229, 57, 53, 0.4);
+}
+
 /* History */
 .history-list {
   display: flex;
@@ -768,4 +781,87 @@
 .status-badge.estimated {
   background: rgba(156, 39, 176, 0.2);
   color: #7B1FA2;
+}
+
+/* uppercase variants from backend */
+.status-badge.pending {
+  background: rgba(244, 208, 63, 0.2);
+  color: #9A7D0A;
+}
+
+.status-badge.estimated,
+.status-badge.estimated {
+  background: rgba(156, 39, 176, 0.2);
+  color: #7B1FA2;
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  animation: toastSlideIn 0.4s ease-out;
+  max-width: 420px;
+  word-break: break-word;
+}
+
+.toast-notification.success {
+  background: linear-gradient(135deg, #2C5F4F, #3a7a65);
+  color: white;
+  border-left: 5px solid #F4D03F;
+}
+
+.toast-notification.error {
+  background: linear-gradient(135deg, #c62828, #e53935);
+  color: white;
+  border-left: 5px solid #ffcdd2;
+}
+
+.toast-close {
+  background: rgba(255,255,255,0.25);
+  border: none;
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.toast-close:hover {
+  background: rgba(255,255,255,0.4);
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.no-improvements-message {
+  color: var(--text-light);
+  font-style: italic;
+  padding: 1rem;
+  background: var(--light);
+  border-radius: 8px;
+  text-align: center;
 }

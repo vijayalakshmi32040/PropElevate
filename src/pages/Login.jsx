@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Login.css';
+import apiService from '../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -78,159 +79,108 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     // Validation
     if (!validateEmail(loginData.email)) {
       setError('Please enter a valid email address');
       setLoading(false);
       return;
     }
-    
+
     if (!loginData.password) {
       setError('Password is required');
       setLoading(false);
       return;
     }
 
-    // Simulate authentication delay
-    setTimeout(() => {
-      // Get registered users from localStorage
-      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-      const userKey = `${loginType}_${loginData.email}`;
-      const storedUser = registeredUsers[userKey];
-
-      // Check if user exists
-      if (!storedUser) {
-        setError('Account not found. Please sign up first.');
-        setLoading(false);
-        return;
-      }
-
-      // Verify password
-      if (storedUser.password !== loginData.password) {
-        setError('Invalid password. Please try again.');
-        setLoading(false);
-        return;
-      }
-
-      // Store user data for session
-      const userData = {
+    try {
+      const userData = await apiService.login({
         email: loginData.email,
-        fullName: storedUser.fullName,
-        userType: loginType,
-        loginTime: new Date().toISOString()
-      };
-      
+        password: loginData.password
+      });
+
+      // Store additional user info
       localStorage.setItem('userType', loginType);
       localStorage.setItem('userEmail', loginData.email);
-      localStorage.setItem('userName', storedUser.fullName);
-      localStorage.setItem('userData', JSON.stringify(userData));
-      localStorage.setItem('isLoggedIn', 'true');
-      
+      localStorage.setItem('userName', userData.fullName);
+
       // Remember me functionality
       if (rememberMe) {
         localStorage.setItem('savedEmail', loginData.email);
       } else {
         localStorage.removeItem('savedEmail');
       }
-      
+
       setSuccess('Login successful! Redirecting...');
-      
+
       setTimeout(() => {
         if (loginType === 'admin') {
           navigate('/design-advisor-dashboard');
         } else if (loginType === 'super-admin') {
           navigate('/admin-management');
         } else {
-          // Check if homeowner already has property data
-          const userPropertyData = localStorage.getItem(`propertyData_${loginData.email}`);
-          if (userPropertyData) {
-            navigate('/homeowner-dashboard');
-          } else {
-            navigate('/homeowner-form');
-          }
+          navigate('/homeowner-dashboard');
         }
       }, 1000);
-    }, 1500);
+    } catch (error) {
+      setError(error.message || 'Login failed. Please try again.');
+      setLoading(false);
+    }
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     // Validation
     if (!signupData.fullName.trim() || signupData.fullName.length < 3) {
       setError('Full name must be at least 3 characters');
       setLoading(false);
       return;
     }
-    
+
     if (!validateEmail(signupData.email)) {
       setError('Please enter a valid email address');
       setLoading(false);
       return;
     }
-    
+
     if (!validatePhone(signupData.phone)) {
       setError('Please enter a valid Indian phone number');
       setLoading(false);
       return;
     }
-    
+
     if (!validatePassword(signupData.password)) {
       setError('Password must be at least 8 characters long');
       setLoading(false);
       return;
     }
-    
+
     if (signupData.password !== signupData.confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
       return;
     }
 
-    // Simulate registration delay
-    setTimeout(() => {
-      // Get existing registered users
-      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-      const userKey = `${loginType}_${signupData.email}`;
-
-      // Check if user already exists
-      if (registeredUsers[userKey]) {
-        setError('An account with this email already exists. Please login instead.');
-        setLoading(false);
-        return;
-      }
-
-      // Store user credentials
-      registeredUsers[userKey] = {
+    try {
+      const userData = await apiService.signup({
         fullName: signupData.fullName,
         email: signupData.email,
         phone: signupData.phone,
         password: signupData.password,
-        userType: loginType,
-        registrationDate: new Date().toISOString()
-      };
-      localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+        role: loginType === 'homeowner' ? 'USER' : 
+              loginType === 'admin' ? 'DESIGN_ADVISOR' : 'ADMIN'
+      });
 
-      // Store user data for session
-      const userData = {
-        fullName: signupData.fullName,
-        email: signupData.email,
-        phone: signupData.phone,
-        userType: loginType,
-        registrationDate: new Date().toISOString()
-      };
-      
+      // Store additional user info
       localStorage.setItem('userType', loginType);
       localStorage.setItem('userEmail', signupData.email);
       localStorage.setItem('userName', signupData.fullName);
-      localStorage.setItem('userData', JSON.stringify(userData));
-      localStorage.setItem('isLoggedIn', 'true');
-      
+
       setSuccess('Account created successfully! Redirecting...');
-      
+
       setTimeout(() => {
         if (loginType === 'admin') {
           navigate('/design-advisor-dashboard');
@@ -240,7 +190,10 @@ const Login = () => {
           navigate('/homeowner-form');
         }
       }, 1000);
-    }, 1500);
+    } catch (error) {
+      setError(error.message || 'Signup failed. Please try again.');
+      setLoading(false);
+    }
   };
 
   return (
