@@ -1,4 +1,4 @@
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'https://propelevate-backend-1.onrender.com/api';
 
 class ApiService {
   constructor() {
